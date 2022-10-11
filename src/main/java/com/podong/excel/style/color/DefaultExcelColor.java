@@ -1,6 +1,6 @@
 package com.podong.excel.style.color;
 
-import com.multi.common.core.exception.CommonException;
+import com.podong.excel.CommonException;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
@@ -43,7 +43,7 @@ public class DefaultExcelColor implements ExcelColor {
 			XSSFCellStyle xssfCellStyle = (XSSFCellStyle) cellStyle;
 			xssfCellStyle.setFillForegroundColor(new XSSFColor(new byte[]{red, green, blue}, new DefaultIndexedColorMap()));
 		} catch (Exception e) {
-			throw new CommonException(String.format("Excel Type %s is not supported now", cellStyle.getClass()));
+			throw new CommonException(String.format("Excel Type %s is not supported now", cellStyle.getClass()), e);
 		}
 		cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 	}
