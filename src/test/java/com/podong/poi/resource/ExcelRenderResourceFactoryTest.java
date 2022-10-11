@@ -1,4 +1,4 @@
-package com.podong.excel.poi.resource;
+package com.podong.poi.resource;
 
 import com.podong.dto.ExcelDto;
 import org.apache.poi.ss.usermodel.BorderStyle;

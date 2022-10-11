@@ -1,8 +1,8 @@
 package com.podong.dto;
 
-import com.podong.excel.annotation.DefaultHeaderStyle;
-import com.podong.excel.annotation.ExcelColumn;
-import com.podong.excel.annotation.ExcelColumnStyle;
+import com.podong.annotation.DefaultHeaderStyle;
+import com.podong.annotation.ExcelColumn;
+import com.podong.annotation.ExcelColumnStyle;
 import com.podong.style.BlackHeaderStyle;
 import com.podong.style.BlueHeaderStyle;
 

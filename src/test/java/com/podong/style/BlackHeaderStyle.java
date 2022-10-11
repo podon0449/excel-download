@@ -1,10 +1,9 @@
 package com.podong.style;
 
-import com.podong.excel.style.CustomExcelCellStyle;
-import com.podong.excel.style.align.DefaultExcelAlign;
-import com.podong.excel.style.border.DefaultExcelBorders;
-import com.podong.excel.style.border.ExcelBorderStyle;
-import com.podong.excel.style.configurer.ExcelCellStyleConfigurer;
+import com.podong.style.align.DefaultExcelAlign;
+import com.podong.style.border.DefaultExcelBorders;
+import com.podong.style.border.ExcelBorderStyle;
+import com.podong.style.configurer.ExcelCellStyleConfigurer;
 
 public class BlackHeaderStyle extends CustomExcelCellStyle {
 
