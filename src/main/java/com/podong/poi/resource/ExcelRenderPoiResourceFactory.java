@@ -5,6 +5,7 @@ import com.podong.CommonException;
 import com.podong.poi.resource.collection.PreCalculatedCellStyleMap;
 import com.podong.style.ExcelCellStyle;
 import com.podong.style.NoExcelCellStyle;
+import com.podong.utils.JsonUtils;
 import com.podong.utils.SuperClassReflectionUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 
@@ -57,14 +58,21 @@ public final class ExcelRenderPoiResourceFactory {
 	 * ExcelDto 로 기본 디폴트 스타일을 지정시킴.  수정하려면 ExcelDto.class 에  excelCellStyleClass 로 변경가능.
 	 * 되도록이면 ExcelColumn 을 사용하여 사용하기 바람.
 	 * */
-	public static ExcelRenderPoiResource prepareRenderResource(List<String> headerKeys, List<String> fieldColumns, Workbook wb,
+	public static ExcelRenderPoiResource prepareRenderResource(List<String> headerKeys, List<?> data, Workbook wb,
                                                                DataFormatDecider dataFormatDecider, ExcelCustomHeader excelCustom) {
 		ExcelColumnStyle classDefinedHeaderStyle = getHeaderExcelColumnStyle(ExcelDto.class);
 		ExcelColumnStyle classDefinedBodyStyle = getBodyExcelColumnStyle(ExcelDto.class);
 
 		PreCalculatedCellStyleMap styleMap = new PreCalculatedCellStyleMap(dataFormatDecider);
 		Map<String, String> headerNamesMap = new LinkedHashMap<>();
+		List<String> fieldColumns = new ArrayList<>();
 
+		//해당 데이터에 필드 컬럼을 뽑아야함 List<?> 타입값이 뭐가넘어올지 모르니 toJson 화 시켜서 Map으로 고정.
+		Map<String, Object> dataColumn = JsonUtils.toMap(JsonUtils.toJson(data.get(0)));
+		fieldColumns.addAll(dataColumn.keySet());
+		if (fieldColumns.size() != headerKeys.size()) {
+			throw new CommonException("fieldColumns headerKeys not match !! ", new VerifyError());
+		}
 		for (int i=0; i < headerKeys.size(); i++) {
 
 			headerNamesMap.put(fieldColumns.get(i), headerKeys.get(i));

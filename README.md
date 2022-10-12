@@ -76,10 +76,8 @@ public class ExcelDto {
 }
 ```
 
-Additionally, There is customizing use case, not pre-defined excel cell style in DefaultExcelCellStyle.
 
-See Customizing section
-
+@ExcelColumn DTO 사용 예제 
 
 ```java
 // In Controller
@@ -87,18 +85,54 @@ See Customizing section
 public class Controller {
 	
   @GetMapping("/any-url")
-  public void methodName(RequestDto requestDto, HttpServletResponse response) throws IOException {
-    // If you specify response type when you use axios,
-    // you don't need to set HttpServletResponse contenttype. See #1 in Front with axios section
-    response.setContentType("application/vnd.ms-excel");
+  public void poiExcelColumnUse(RequestDto requestDto, HttpServletResponse response) throws IOException {
+      // If you specify response type when you use axios,
+      // you don't need to set HttpServletResponse contenttype. See #1 in Front with axios section
+      response.setContentType("application/vnd.ms-excel");
   
+      List<ExcelDto> excelDtos = someService.getRenderedData(requestDto);
+      ExcelFile excelFile = new PoiSheetExcelFile(excelDtos, ExcelDto.class);
+      excelFile.write(response.getOutputStream());
+  }
+
+}
+```
+
+Key custom 사용 예제 
+```java
+// In Controller
+@RestController
+public class Controller {
+	
+  @GetMapping("/any-url")
+  public void poiUserColumnUse(RequestDto requestDto, HttpServletResponse response) throws IOException {
+      // If you specify response type when you use axios,
+      // you don't need to set HttpServletResponse contenttype. See #1 in Front with axios section
+      response.setContentType("application/vnd.ms-excel");
+      //테스트 데이터 삽입 
+      List<Map<String, Object>> excelMetaList = new ArrayList<>();
+      for (int i=1; i < 1000; i++) {
+          Map<String, Object> metaMap = new HashMap<>();
+          metaMap.put("rank", i);
+          metaMap.put("userIdx", "1000000" + i);
+          metaMap.put("countryName", "한국");
+          metaMap.put("device", "Aos");
+          metaMap.put("nickname", "나는엑셀테스트");
+          metaMap.put("email", "test"+i+"@naver.com");
+          metaMap.put("amount", i + 1000);
+          excelMetaList.add(metaMap);
+      }
+      // 해당 헤더 keys
+      String[] keys = {"순위", "유저정보", "국가", "기기", "닉네임", "이메일", "유저 보유 금액"};
+      
     List<ExcelDto> excelDtos = someService.getRenderedData(requestDto);
-    ExcelFile excelFile = new OneSheetExcelFile<>(excelDtos, ExcelDto.class);
+    ExcelFile excelFile = new PoiSheetExcelFile<>(excelDtos, ExcelDto.class);
     excelFile.write(response.getOutputStream());
   }
 
 }
 ```
+
 
 ### Front with axios
 ```js

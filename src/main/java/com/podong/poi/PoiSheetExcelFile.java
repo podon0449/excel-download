@@ -27,8 +27,8 @@ public final class PoiSheetExcelFile<T> extends XSSFExcelFile<T> {
 		super(data, type);
 	}
 
-	public PoiSheetExcelFile(List<T> data, List<String> headerKeys, List<String> fieldKeys, ExcelCustomHeader excelCustom) {
-		super(data, headerKeys, fieldKeys, excelCustom);
+	public PoiSheetExcelFile(List<T> data, List<String> headerKeys, ExcelCustomHeader excelCustom) {
+		super(data, headerKeys,  excelCustom);
 	}
 
 	public PoiSheetExcelFile(List<T> data, Class<T> type, DataFormatDecider dataFormatDecider) {
@@ -68,7 +68,7 @@ public final class PoiSheetExcelFile<T> extends XSSFExcelFile<T> {
 	@Override
 	public void addSheet(Map<String, Object> dataMap) {
 		List<T> data = (List<T>) dataMap.get("excelList");
-		super.resource = ExcelRenderPoiResourceFactory.prepareRenderResource((List<String>)dataMap.get("headerKeys"), (List<String>)dataMap.get("fieldKeys"), wb, new DefaultDataFormatDecider() , (ExcelCustomHeader) dataMap.get("ExcelColumn"));
+		super.resource = ExcelRenderPoiResourceFactory.prepareRenderResource((List<String>)dataMap.get("headerKeys"), data, wb, new DefaultDataFormatDecider() , (ExcelCustomHeader) dataMap.get("ExcelColumn"));
 		renderExcel(data);
 	}
 

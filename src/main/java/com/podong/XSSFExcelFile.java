@@ -38,8 +38,8 @@ public abstract class XSSFExcelFile<T> implements ExcelFile<T> {
 	public XSSFExcelFile(List<T> data, Class<T> type) {
 		this(data, type, new DefaultDataFormatDecider());
 	}
-	public XSSFExcelFile(List<T> data, List<String> headerKeys, List<String> fieldKeys, ExcelCustomHeader excelCustom) {
-		this(data, headerKeys, fieldKeys, excelCustom, new DefaultDataFormatDecider());
+	public XSSFExcelFile(List<T> data, List<String> headerKeys, ExcelCustomHeader excelCustom) {
+		this(data, headerKeys, excelCustom, new DefaultDataFormatDecider());
 	}
 
 	/**
@@ -56,10 +56,10 @@ public abstract class XSSFExcelFile<T> implements ExcelFile<T> {
 	 * XSSFExcelFile
 	 * USER 가 직접 keyColumn 커스텀 하는 경우 사용.
 	 * */
-	public XSSFExcelFile(List<T> data, List<String> headerKeys, List<String> fieldKeys, ExcelCustomHeader excelCustom, DataFormatDecider dataFormatDecider) {
+	public XSSFExcelFile(List<T> data, List<String> headerKeys, ExcelCustomHeader excelCustom, DataFormatDecider dataFormatDecider) {
 		validateData(data);
 		this.wb = new XSSFWorkbook();
-		this.resource = ExcelRenderPoiResourceFactory.prepareRenderResource(headerKeys, fieldKeys, wb, dataFormatDecider, excelCustom);
+		this.resource = ExcelRenderPoiResourceFactory.prepareRenderResource(headerKeys, data, wb, dataFormatDecider, excelCustom);
 		renderExcel(data);
 	}
 
