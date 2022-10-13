@@ -1,5 +1,7 @@
 package com.podong;
 
+import com.podong.poi.resource.ExcelCustomHeader;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -11,6 +13,8 @@ public interface ExcelFile<T>  {
 
 	void addRows(List<T> data);
 
-	void addSheet(Map<String, Object> dataMap);
+	void addSheet(List<T> data, Class<T> type);
+
+	void addSheet(List<T> data, List<String> header, ExcelCustomHeader customHeader);
 
 }

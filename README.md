@@ -25,11 +25,11 @@ allprojects {
 
 // Use proper version
 dependencies {
-  implementation 'com.github.podon0449:excel-download:1.0.0'
+  implementation 'com.github.podon0449:excel-download:1.0.2'
 }
 ```
 
-### Server
+### 1. Poi ExcelColumn 사용법 
 
 ```java
 // In ExcelDeto
@@ -75,7 +75,71 @@ public class ExcelDto {
 	
 }
 ```
+### 2. Gc Column 사용법 (PivotTable)
+```java
+/**
+ * 해당 필드와 데이터를 매칭시키는 enum
+ * active 를 활성화 시킨경우 pivotFieldOrientation 을 지정할 수 있음.
+ *
+ *    1 : PivotFieldOrientation.PageField;
+ *    2 : PivotFieldOrientation.RowField;
+ *    3 : PivotFieldOrientation.DataField;
+ *    4 : PivotFieldOrientation.Hidden;
+ *    5 : PivotFieldOrientation.ColumnField;
+ *
+ *    type 은 넘어온 list 인덱스 순서  
+ *    PivotEnumModel 은 해당 lib 내장되어 있음 
+ * */
+public enum UserExcelField implements PivotEnumModel {
+    RANK(0,"순위", false, 0),
+    USER_IDX(1,"유저정보", true, 2),
+    COUNTRY(2,"국가", false, 0),
+    DEVICE(3,"기기", false, 0),
+    NICKNAME(4,"닉네임" , true, 1),
+    EMAIL(5,"이메일" , false, 0),
+    AMOUNT(6,"유저 보유금액" , true, 3);
 
+    private int type;
+    private String name;
+    private boolean active;
+    private int pivotFieldOrientation;
+
+    UserExcelFiled(int type, String name, boolean active, int pivotFieldOrientation) {
+        this.type = type;
+        this.name = name;
+        this.active = active;
+        this.pivotFieldOrientation = pivotFieldOrientation;
+    }
+    public String getKey() {
+        return name();
+    }
+
+    public String getValue() {
+        return String.valueOf(this.type);
+    }
+
+    public int getType() {
+        return this.type;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public int getCode() { return this.type;}
+
+    public int getPivotFieldOrientation() {
+        return pivotFieldOrientation;
+    }
+
+
+}
+```
+### 1. Poi lib 사용 예제 
 
 @ExcelColumn DTO 사용 예제 
 
@@ -88,7 +152,8 @@ public class Controller {
   public void poiExcelColumnUse(RequestDto requestDto, HttpServletResponse response) throws IOException {
       // If you specify response type when you use axios,
       // you don't need to set HttpServletResponse contenttype. See #1 in Front with axios section
-      response.setContentType("application/vnd.ms-excel");
+      response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      response.setHeader("Content-Disposition", "attachment;filename=excelFile.xlsx");
   
       List<ExcelDto> excelDtos = someService.getRenderedData(requestDto);
       ExcelFile excelFile = new PoiSheetExcelFile(excelDtos, ExcelDto.class);
@@ -98,7 +163,7 @@ public class Controller {
 }
 ```
 
-Key custom 사용 예제 
+유저가 직접 헤더키를 지정하는 경우 사용 예제 
 ```java
 // In Controller
 @RestController
@@ -108,7 +173,8 @@ public class Controller {
   public void poiUserColumnUse(RequestDto requestDto, HttpServletResponse response) throws IOException {
       // If you specify response type when you use axios,
       // you don't need to set HttpServletResponse contenttype. See #1 in Front with axios section
-      response.setContentType("application/vnd.ms-excel");
+      response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      response.setHeader("Content-Disposition", "attachment;filename=excelFile.xlsx");
       //테스트 데이터 삽입 
       List<Map<String, Object>> excelMetaList = new ArrayList<>();
       for (int i=1; i < 1000; i++) {
@@ -123,16 +189,87 @@ public class Controller {
           excelMetaList.add(metaMap);
       }
       // 해당 헤더 keys
-      String[] keys = {"순위", "유저정보", "국가", "기기", "닉네임", "이메일", "유저 보유 금액"};
-      
+    List<String> headerKeys = Arrays.asList("순위", "유저정보", "국가", "기기", "닉네임", "이메일", "유저 보유 금액");
+
     List<ExcelDto> excelDtos = someService.getRenderedData(requestDto);
-    ExcelFile excelFile = new PoiSheetExcelFile<>(excelDtos, ExcelDto.class);
+    ExcelFile excelFile = new PoiSheetExcelFile(excelMetaList, headerKeys, USER_COLUMN);
     excelFile.write(response.getOutputStream());
   }
 
 }
 ```
+엑셀 시트 추가 예제 
+```java
+// In Controller
+@RestController
+public class Controller {
+	
+  @GetMapping("/any-url")
+  public void addExcelSheet(RequestDto requestDto, HttpServletResponse response) throws IOException {
+      // If you specify response type when you use axios,
+      // you don't need to set HttpServletResponse contenttype. See #1 in Front with axios section
+      response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      response.setHeader("Content-Disposition", "attachment;filename=excelFile.xlsx");
+      List<ExcelDto> excelDtos = someService.getRenderedData(requestDto);
+      ExcelFile excelFile = new PoiSheetExcelFile(excelDtos, ExcelDto.class);
+      //ExcelColumn 으로 addSheet 하는 경우 
+      List<ExcelDetailDto> excelDetailDtos = someService.getRenderedDetailData(requestDto);
+      excelFile.addSheet(excelDetailDtos, ExcelDetailDto.class);
+      
+      //유저가 직접 헤더키를 지정하는 경우  
+      List<Map<String, Object>> excelCustomList = new ArrayList<>();
+      for (int i=1; i < 1000; i++) {
+          Map<String, Object> metaMap = new HashMap<>();
+          metaMap.put("rank", i);
+          metaMap.put("userIdx", "1000000" + i);
+          metaMap.put("countryName", "한국");
+          metaMap.put("device", "Aos");
+          metaMap.put("nickname", "나는엑셀테스트");
+          metaMap.put("email", "test"+i+"@naver.com");
+          metaMap.put("amount", i + 1000);
+          excelMetaList.add(metaMap);
+      }
+      List<String> headerKeys = Arrays.asList("순위", "유저정보", "국가", "기기", "닉네임", "이메일", "유저 보유 금액");
 
+      excelFile.addSheet(excelCustomList, headerKeys);
+      
+      excelFile.write(response.getOutputStream());
+  }
+
+}
+```
+
+### 2. Gc lib 사용 예제 (PivotTable)
+```java
+// In Controller
+@RestController
+public class Controller {
+	
+  @GetMapping("/any-url")
+  public void PivotTable(RequestDto requestDto, HttpServletResponse response) throws IOException {
+      response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      response.setHeader("Content-Disposition", "attachment;filename=excelFile.xlsx");
+      
+      List<List<Object>> sourceList = new ArrayList<>();
+
+      for (int i=0; i < 100; i++) {
+          List<Object> list = new ArrayList<>();
+          list.add(i);
+          list.add("100000" + i);
+          list.add("한국");
+          list.add("AOS");
+          list.add("nickname_"+ i);
+          list.add("erqrk@.naver.com");
+          list.add(i + 1000);
+          sourceList.add(list);
+      }
+      ExcelFile excelFile = new GcSheetExcelFile(sourceList, UserExcelFiled.class);
+
+      excelFile.write(response.getOutputStream());
+  }
+
+}
+```
 
 ### Front with axios
 ```js
@@ -235,5 +372,5 @@ public class ExcelDto {
 
 ## Kinds of Excel File
 
-- OneSheetExcelFile
-- MultiSheetExcelFile
+- PoiSheetExcelFile
+- GcSheetExcelFile

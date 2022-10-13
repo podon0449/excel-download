@@ -3,6 +3,7 @@ package com.podong.gc;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.podong.PivotExcelFile;
 import com.podong.ExcelException;
+import com.podong.poi.resource.ExcelCustomHeader;
 import com.podong.utils.JsonUtils;
 
 import java.util.List;
@@ -45,7 +46,11 @@ public final class GcSheetExcelFile<T> extends PivotExcelFile<T> {
 	public void addRows(List<T> data) {}
 
 	@Override
-	public void addSheet(Map<String, Object> dataMap) {}
+	public void addSheet(List<T> data, Class<T> type) {}
+
+	@Override
+	public void addSheet(List<T> data, List<String> header, ExcelCustomHeader customHeader) {}
+
 
 
 
