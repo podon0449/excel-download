@@ -227,11 +227,11 @@ public class Controller {
           metaMap.put("nickname", "나는엑셀테스트");
           metaMap.put("email", "test"+i+"@naver.com");
           metaMap.put("amount", i + 1000);
-          excelMetaList.add(metaMap);
+          excelCustomList.add(metaMap);
       }
       List<String> headerKeys = Arrays.asList("순위", "유저정보", "국가", "기기", "닉네임", "이메일", "유저 보유 금액");
 
-      excelFile.addSheet(excelCustomList, headerKeys);
+      excelFile.addSheet(excelCustomList, headerKeys, USER_COLUMN);
       
       excelFile.write(response.getOutputStream());
   }
